@@ -32,33 +32,68 @@ public class Terrain extends JPanel implements ActionListener{
 	public void paint(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
-		//p1 rotation
-		AffineTransform tx = AffineTransform.getRotateInstance(p1.getAngle(),locationX,locationY);
-		AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-		//p2 rotation
-		AffineTransform tx1 = AffineTransform.getRotateInstance(p2.getAngle(),locationX,locationY);
-		AffineTransformOp op1 = new AffineTransformOp(tx1, AffineTransformOp.TYPE_BILINEAR);
-		//player1 draw
-		g2d.drawImage(op.filter(p1.getImage(), null), p1.getX(), p1.getY(), null);
-		//player 2 draw
-		g2d.drawImage(op1.filter(p2.getImage(), null), p2.getX(), p2.getY(), null);
-		//bullets
-		ArrayList bullets = p1.getBullets();
-		for(int i = 0; i<bullets.size(); i++) {
-			Bullet b = (Bullet)bullets.get(i);
+		if(run) {
+			//Scores
 			g.setColor(Color.white);
-			g.fillOval(b.getX(), b.getY(), Common.BULLET_SIZE, Common.BULLET_SIZE);
-		}
-		//bullets
-		ArrayList bullets2 = p2.getBullets();
-		for(int i = 0; i<bullets2.size(); i++) {
-			Bullet b2 = (Bullet)bullets2.get(i);
+			g.setFont(new Font("Ink Free",Font.BOLD, 15));
+			g.drawString("Score J1: "+p1_score, 20, 15);
+			//---------------------------------------------------
 			g.setColor(Color.black);
-			g.fillOval(b2.getX(), b2.getY(), Common.BULLET_SIZE, Common.BULLET_SIZE);
+			g.setFont(new Font("Ink Free",Font.BOLD, 15));
+			FontMetrics metrics = getFontMetrics(g.getFont());
+			g.drawString("Score J2: "+p2_score, (Common.SCREEN_WIDTH - metrics.stringWidth("Score J2: "+p2_score))-20, 15);
+			//hp
+			g.setColor(Color.white);
+			g.setFont(new Font("Ink Free",Font.BOLD, 15));
+			g.drawString("Vie J1: "+p1.gethp(), 15, Common.SCREEN_WIDTH-20);
+			//---------------------------------------------------
+			g.setColor(Color.black);
+			g.setFont(new Font("Ink Free",Font.BOLD, 15));
+			g.drawString("Vie J2: "+p2.gethp(),Common.SCREEN_WIDTH - 20 - metrics.stringWidth("Vie J2: "+p2.gethp()),Common.SCREEN_HEIGHT-20);
+			//p1 rotation
+			AffineTransform tx = AffineTransform.getRotateInstance(p1.getAngle(),locationX,locationY);
+			AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+			//p2 rotation
+			AffineTransform tx1 = AffineTransform.getRotateInstance(p2.getAngle(),locationX,locationY);
+			AffineTransformOp op1 = new AffineTransformOp(tx1, AffineTransformOp.TYPE_BILINEAR);
+			//player1 draw
+			g2d.drawImage(op.filter(p1.getImage(), null), p1.getX(), p1.getY(), null);
+			//player 2 draw
+			g2d.drawImage(op1.filter(p2.getImage(), null), p2.getX(), p2.getY(), null);
+			//bullets1
+			ArrayList bullets = p1.getBullets();
+			for(int i = 0; i<bullets.size(); i++) {
+				Bullet b = (Bullet)bullets.get(i);
+				g.setColor(Color.white);
+				g.fillOval(b.getX(), b.getY(), Common.BULLET_SIZE, Common.BULLET_SIZE);
+			}
+			//bullets2
+			ArrayList bullets2 = p2.getBullets();
+			for(int i = 0; i<bullets2.size(); i++) {
+				Bullet b2 = (Bullet)bullets2.get(i);
+				g.setColor(Color.black);
+				g.fillOval(b2.getX(), b2.getY(), Common.BULLET_SIZE, Common.BULLET_SIZE);
+			}
 		}
+		else
+			gameOver(g);
 	}
 	
 	public void gameOver(Graphics g) {
+		g.setFont(new Font("Ink Free",Font.BOLD, 75));
+		FontMetrics metrics = getFontMetrics(g.getFont());
+		if(p1_score > p2_score) {
+			g.setColor(Color.white);
+			g.drawString("Joueur 1 Gagne!", (Common.SCREEN_WIDTH - metrics.stringWidth("Joueur 1 Gagne!"))/2, Common.SCREEN_HEIGHT/2);
+		}
+		else if(p1_score < p2_score) {
+			g.setColor(Color.black);
+			g.drawString("Joueur 2 Gagne!", (Common.SCREEN_WIDTH - metrics.stringWidth("Joueur 2 Gagne!"))/2, Common.SCREEN_HEIGHT/2);
+		}
+		else {
+			g.setColor(Color.green);
+			g.drawString("Egalite!", (Common.SCREEN_WIDTH - metrics.stringWidth("Egalite!"))/2, Common.SCREEN_HEIGHT/2);
+		}
 		
 	}
 
@@ -98,7 +133,6 @@ public class Terrain extends JPanel implements ActionListener{
 					if(r1.intersects(r2)) {
 						b2.setVisible(false);
 						p1.take_dmg();
-						System.out.println(p1.gethp());
 					}
 					if(p1.die()) {
 						p2_score++;
@@ -107,6 +141,10 @@ public class Terrain extends JPanel implements ActionListener{
 					b2.update();
 				}
 				else bullets2.remove(i);
+			}
+			if(p1_score == 10 || p2_score == 10) {
+				run = false;
+				clock.stop();
 			}
 		}
 		repaint();

@@ -14,15 +14,18 @@ public class Spaceship {
 	private double rotate = 0;
 	private int hp = 100;
 	private int player_number=0;
-	public static ArrayList Bullets,Bullets2;
+	public static ArrayList Bullets,Bullets2;	
 	public Spaceship(int n) {
 		this.player_number = n;
 		Bullets = new ArrayList();
 		Bullets2 = new ArrayList();
+		File root = new File(System.getProperty("user.dir"));
+		File img1 = new File(root, "src/ressources/white.png");
+		File img2 = new File(root, "src/ressources/black.png");
 		this.respawn();
 		if(this.player_number == 1) {
 			try {
-				still = ImageIO.read(new File("C:/white.png"));
+				still = ImageIO.read(img1);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -30,7 +33,7 @@ public class Spaceship {
 		}
 		else if(this.player_number == 2) {
 			try {
-				still = ImageIO.read(new File("C:/black1.png"));
+				still = ImageIO.read(img2);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -43,9 +46,6 @@ public class Spaceship {
 	public void move() {
 		this.x += Common.P_SPEED * Math.cos(this.angle);
 		this.y += Common.P_SPEED * Math.sin(this.angle);
-		File root = new File(System.getProperty("user.dir"));
-		File resource = new File(root, "src/ressources/white.png");
-		System.out.println(resource);
 	}
 	public void check_screen_collision() {
 		if(this.x > Common.SCREEN_WIDTH) this.x = 0;
@@ -81,7 +81,7 @@ public class Spaceship {
 		}
 	}
 	public Rectangle hitbox() {
-		return (new Rectangle(this.x,this.y,16,16));
+		return (new Rectangle(this.x-2,this.y,19,20));
 	}
 	public ArrayList getBullets() {
 		if(player_number == 1) {
